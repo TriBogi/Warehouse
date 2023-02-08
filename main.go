@@ -1,37 +1,35 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"log"
 	"warehouse/brand"
+	"warehouse/config"
 	"warehouse/handler"
 )
 
 var DB *gorm.DB
 
 func main() {
-	var err error
-	dsn := "host=localhost user=postgres password=Berandallasta15 dbname=db_warehouse port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-
-	DB = db
-
+	db, err := config.GetDB()
 	if err != nil {
-		fmt.Println("success to connection database")
+		log.Fatal(err)
 	}
 
-	brandRepository := brand.NewRepository(db)
-	brandService := brand.NewService(brandRepository)
-
-	brandHandler := handler.NewBrandHandler(brandService)
+	brandRepo := brand.NewRepository(db)
+	brandSvc := brand.NewService(brandRepo)
+	brandHandler := handler.NewBrandHandler(brandSvc)
 
 	router := gin.Default()
-	api := router.Group("/api/v3")
-	api.POST("/registerbrand", brandHandler.RegisterBrandHandler)
-	api.GET("/getbrandlist", brandHandler.GetBrandHandler)
-	api.DELETE("/deletebrand", brandHandler.DeleteBrandHandler)
+	superGroup := router.Group("/api/v1")
+
+	/* Path brand */
+	brandGroup := superGroup.Group("/brand")
+	brandGroup.POST("/register", brandHandler.RegisterBrandHandler)
+	brandGroup.GET("/getList", brandHandler.GetBrandHandler)
+	brandGroup.DELETE("/delete/:id", brandHandler.DeleteBrandHandler)
+
 	router.Run(":5550")
 
 }
