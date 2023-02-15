@@ -1,11 +1,16 @@
 package brand
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+	"log"
+)
 
 type Repository interface {
 	Save(saveBrand Brand) (Brand, error)
-	GetBrandList() ([]Brand, error)
-	Delete() ([]Brand, error)
+	GetAll() ([]Brand, error)
+	Delete(ID int) error
+	FindByID(ID int) (Brand, error)
+	Update(brand Brand) (Brand, error)
 }
 
 type repository struct {
@@ -19,7 +24,7 @@ func NewRepository(db *gorm.DB) *repository {
 
 func (r *repository) Save(saveBrand Brand) (Brand, error) {
 
-	err := r.db.Create(&saveBrand).Error
+	err := r.db.Table("brand").Create(&saveBrand).Error
 	if err != nil {
 		return saveBrand, err
 	}
@@ -28,24 +33,43 @@ func (r *repository) Save(saveBrand Brand) (Brand, error) {
 
 }
 
-func (r *repository) GetBrandList() ([]Brand, error) {
-	var getBrand []Brand
+func (r *repository) GetAll() ([]Brand, error) {
+	var brands []Brand
 
-	err := r.db.Find(&getBrand).Error
+	err := r.db.Table("brand").Find(&brands).Error
 	if err != nil {
-		return getBrand, err
+		log.Fatalln(err)
 	}
-	return getBrand, nil
+	return brands, nil
 }
 
-func (r *repository) Delete() ([]Brand, error) {
-	var deleteBrand []Brand
+func (r *repository) Delete(ID int) error {
+	var brand Brand
 
-	err := r.db.Delete(&deleteBrand).Error
+	err := r.db.Table("brand").Delete(&brand, ID).Error
 
 	if err != nil {
-		return deleteBrand, err
+		return err
 	}
-	return deleteBrand, nil
+	return nil
+}
 
+func (r *repository) FindByID(ID int) (Brand, error) {
+	var brand Brand
+
+	err := r.db.Table("brand").Where("brd_id = ?", ID).Find(&brand).Error
+
+	if err != nil {
+		return brand, err
+	}
+	return brand, nil
+}
+
+func (r *repository) Update(brand Brand) (Brand, error) {
+	err := r.db.Table("brand").Save(&brand).Error
+
+	if err != nil {
+		return brand, err
+	}
+	return brand, nil
 }

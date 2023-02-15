@@ -26,8 +26,10 @@ func main() {
 
 	/* Path brand */
 	brandGroup := superGroup.Group("/brand")
+	brandGroup.GET("/getList", brandHandler.GetBrandsHandler)
 	brandGroup.POST("/register", brandHandler.RegisterBrandHandler)
-	brandGroup.GET("/getList", brandHandler.GetBrandHandler)
+	brandGroup.GET("/:id", brandHandler.GetBrandByIDHandler)
+	brandGroup.PUT("/update/:id", brandHandler.UpdateBrandHandler)
 	brandGroup.DELETE("/delete/:id", brandHandler.DeleteBrandHandler)
 
 	router.Run(":5550")
