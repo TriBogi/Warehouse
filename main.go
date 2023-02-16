@@ -32,6 +32,5 @@ func main() {
 	brandGroup.PUT("/update/:id", brandHandler.UpdateBrandHandler)
 	brandGroup.DELETE("/delete/:id", brandHandler.DeleteBrandHandler)
 
-	router.Run(":5550")
-
+	router.Run("127.0.0.1:5000")
 }

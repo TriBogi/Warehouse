@@ -24,7 +24,6 @@ func (s *service) RegisterBrand(input CreateBrandInput) (Brand, error) {
 	inputBrand := Brand{
 		Brd_Name:  input.BrdName,
 		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
 	}
 	res, err := s.repository.Save(inputBrand)
 	if err != nil {
@@ -56,6 +55,7 @@ func (s *service) UpdateBrand(inputID GetBrandDetailInput, inputData CreateBrand
 	}
 
 	brand.Brd_Name = inputData.BrdName
+	brand.UpdatedAt = time.Now()
 
 	updatedBrand, err := s.repository.Update(brand)
 	if err != nil {
